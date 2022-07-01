@@ -60,7 +60,10 @@ export class HttpAdapter<O extends Operations> {
       path?: Record<string, any>;
     } = {}
   ) {
-    const builder = new HttpAdapterBuilder({
+    const builder = new HttpAdapterBuilder<
+      any,
+      { Body: true; Query: true; Path: true }
+    >({
       path,
       method: opts.method ?? 'GET',
       ...this.opts,
