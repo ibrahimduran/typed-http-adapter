@@ -88,8 +88,8 @@ export class HttpAdapterBuilder<
   private async _raw() {
     const method = this.opts.method;
     const url = await this._buildUrl();
-    const headers = await this._buildHeaders();
     const body = await this._buildBody();
+    const headers = await this._buildHeaders(body != null);
 
     let res: Response;
 
@@ -135,10 +135,10 @@ export class HttpAdapterBuilder<
     return normalizeUrl(`${baseUrl || ''}${path}${searchParams}`);
   }
 
-  private async _buildHeaders() {
+  private async _buildHeaders(hasBody: boolean) {
     const dict: Record<string, string> = {};
 
-    if (this.opts.method.toLowerCase() === 'post') {
+    if (hasBody) {
       dict['Content-Type'] = this._type;
     }
 
