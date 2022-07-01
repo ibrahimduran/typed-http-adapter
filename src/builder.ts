@@ -84,11 +84,17 @@ export class HttpAdapterBuilder<
     const headers = await this._buildHeaders();
     const body = await this._buildBody();
 
-    const res = await fetch(url, {
-      method,
-      body,
-      headers,
-    });
+    let res: Response;
+
+    try {
+      res = await fetch(url, {
+        method,
+        body,
+        headers,
+      });
+    } catch (err) {
+      return await HttpAdapterResult.createFromError(err);
+    }
 
     return await HttpAdapterResult.createFromResponse(res);
   }

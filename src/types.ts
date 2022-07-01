@@ -88,7 +88,7 @@ export type OpenAPI3SchemaAdapter<O> = {
 };
 
 export class HttpAdapterError extends Error {
-  public readonly result: HttpAdapterResult;
+  public readonly result: HttpAdapterResult | undefined;
 
   constructor(props: Pick<HttpAdapterError, 'result' | 'message'>) {
     super(props.message);
@@ -100,6 +100,7 @@ export class HttpAdapterError extends Error {
 export class HttpAdapterResult {
   public readonly status: number;
   public readonly body: any;
+  public readonly error?: any | undefined;
   public readonly message?: string | undefined;
   public readonly response?: Response | undefined;
 
@@ -108,6 +109,16 @@ export class HttpAdapterResult {
     this.body = props.body;
     this.message = props.message;
     this.response = props.response;
+  }
+
+  static async createFromError(err: any) {
+    return new HttpAdapterResult({
+      status: -1,
+      body: null,
+      error: err,
+      message: err?.message,
+      response: undefined,
+    });
   }
 
   static async createFromResponse(res: Response) {
