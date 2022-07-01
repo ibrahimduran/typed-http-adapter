@@ -104,11 +104,16 @@ export class HttpAdapterBuilder<
     let path = this.opts.path;
 
     for (const key in this._path) {
+      if (this._path[key] == null) {
+        continue;
+      }
+
       const value = String(this._path[key]);
       path = path.replace(`{${key}}`, value);
     }
 
     let searchParams = Object.entries(this._query || {})
+      .filter(([, value]) => value != null)
       .map(([key, value]) => `${key}=${encodeURIComponent(String(value))}`)
       .join('&');
 
