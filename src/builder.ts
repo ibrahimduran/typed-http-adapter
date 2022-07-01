@@ -115,7 +115,7 @@ export class HttpAdapterBuilder<
       }
 
       const value = String(this._path[key]);
-      path = path.replace(`{${key}}`, value);
+      path = path.replace(`{${key}}`, value).replace(`:${key}`, value);
     }
 
     let searchParams = Object.entries(this._query || {})
