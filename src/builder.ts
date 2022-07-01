@@ -1,3 +1,4 @@
+import normalizeUrl from 'normalize-url';
 import type {
   HttpAdapterOptions,
   OperationRawResponse,
@@ -120,7 +121,7 @@ export class HttpAdapterBuilder<
         ? await this.opts.baseUrl()
         : this.opts.baseUrl;
 
-    return `${baseUrl || ''}${path}${searchParams}`;
+    return normalizeUrl(`${baseUrl || ''}${path}${searchParams}`);
   }
 
   private async _buildHeaders() {

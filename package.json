@@ -60,5 +60,8 @@
     "**/prettier": "^2.7.1",
     "**/eslint-config-react-app": "^6.0.0",
     "**/eslint": "^7.28.0"
+  },
+  "dependencies": {
+    "normalize-url": "^7.0.3"
   }
 }
