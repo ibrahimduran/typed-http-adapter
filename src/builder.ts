@@ -76,7 +76,13 @@ export class HttpAdapterBuilder<
       return result.body;
     }
 
-    throw new HttpAdapterError({ result, message: '' });
+    const url = await this._buildUrl();
+    throw new HttpAdapterError({
+      result,
+      message: `${this.opts.method.toUpperCase()} ${url} returned ${
+        result.status
+      }`,
+    });
   }
 
   private async _raw() {
