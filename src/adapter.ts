@@ -53,17 +53,32 @@ export class HttpAdapter<O extends Operations> {
   request(
     path: string,
     opts: {
-      method: string;
+      method?: string;
       type?: string;
       body?: any;
       query?: Record<string, any>;
-      params?: Record<string, any>;
-    }
+      path?: Record<string, any>;
+    } = {}
   ) {
-    new HttpAdapterBuilder({
+    const builder = new HttpAdapterBuilder({
       path,
-      method: opts.method,
+      method: opts.method ?? 'GET',
+      ...this.opts,
     });
+
+    if (opts.type && opts.body) {
+      builder.body(opts.type, opts.body);
+    }
+
+    if (opts.query) {
+      builder.query(opts.query);
+    }
+
+    if (opts.path) {
+      builder.path(opts.path);
+    }
+
+    return builder;
   }
 
   private createBuilder<Key extends keyof O>(
