@@ -49,6 +49,7 @@ export class HttpAdapter<O extends Array<Operation>> {
     return new HttpAdapterBuilder<FindOperationByPath<O, P>>({
       path,
       method: 'GET',
+      ...this.opts,
     });
   }
 
@@ -56,6 +57,7 @@ export class HttpAdapter<O extends Array<Operation>> {
     return new HttpAdapterBuilder<FindOperationByPath<O, P>>({
       path,
       method: 'POST',
+      ...this.opts,
     });
   }
 
@@ -63,6 +65,7 @@ export class HttpAdapter<O extends Array<Operation>> {
     return new HttpAdapterBuilder<FindOperationByPath<O, P>>({
       path,
       method: 'PUT',
+      ...this.opts,
     });
   }
 
@@ -70,6 +73,7 @@ export class HttpAdapter<O extends Array<Operation>> {
     return new HttpAdapterBuilder<FindOperationByPath<O, P>>({
       path,
       method: 'DELETE',
+      ...this.opts,
     });
   }
 
