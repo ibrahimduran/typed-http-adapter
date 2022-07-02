@@ -1,14 +1,14 @@
 import normalizeUrl from 'normalize-url';
 import type {
   HttpAdapterOptions,
+  Operation,
   OperationRawResponse,
   OperationSendResponse,
-  Operations,
 } from './types';
 import { HttpAdapterError, HttpAdapterResult } from './types';
 
 export class HttpAdapterBuilder<
-  O extends Operations[string],
+  O extends Operation,
   Inserted extends { Body: boolean; Query: boolean; Path: boolean } = {
     Body: false;
     Query: false;
@@ -25,15 +25,19 @@ export class HttpAdapterBuilder<
     private readonly opts: {
       path: string;
       method: string;
-    } & HttpAdapterOptions
+    } & HttpAdapterOptions<[O]>
   ) {}
 
-  path(vars: O['Path']): HttpAdapterBuilder<O, Inserted & { Path: true }> {
+  path(
+    vars: O['Param']['Path']
+  ): HttpAdapterBuilder<O, Inserted & { Path: true }> {
     this._path = vars;
     return this;
   }
 
-  query(vars: O['Query']): HttpAdapterBuilder<O, Inserted & { Query: true }> {
+  query(
+    vars: O['Param']['Query']
+  ): HttpAdapterBuilder<O, Inserted & { Query: true }> {
     this._query = vars;
     return this;
   }
@@ -54,20 +58,20 @@ export class HttpAdapterBuilder<
   }
 
   public readonly raw: O['Body'] & Inserted['Body'] extends never | true
-    ? O['Query'] & Inserted['Query'] extends never | true
-      ? O['Path'] & Inserted['Path'] extends never | true
+    ? O['Param']['Query'] & Inserted['Query'] extends never | true
+      ? O['Param']['Path'] & Inserted['Path'] extends never | true
         ? () => Promise<OperationRawResponse<O>>
         : never
       : never
     : never = this._raw as any;
 
   public readonly send: O['Body'] & Inserted['Body'] extends never | true
-    ? O['Query'] & Inserted['Query'] extends never | true
-      ? O['Path'] & Inserted['Path'] extends never | true
+    ? O['Param']['Query'] & Inserted['Query'] extends never | true
+      ? O['Param']['Path'] & Inserted['Path'] extends never | true
         ? () => Promise<OperationSendResponse<O>>
-        : never
-      : never
-    : never = this._send as any;
+        : { path: never }
+      : { query: never }
+    : { body: never } = this._send as any;
 
   private async _send() {
     const result = await this._raw();

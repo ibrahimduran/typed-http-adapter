@@ -1,35 +1,23 @@
 import { HttpAdapterBuilder } from './builder';
 import type {
+  FindOperationByPath,
   HttpAdapterOptions,
   HttpAdapterProxyFunction,
-  Operations,
-  OperationsIdsByMethod,
+  Operation,
+  OperationPathsByMethod,
 } from './types';
 
-export class HttpAdapter<O extends Operations> {
-  private readonly opts: HttpAdapterOptions;
-  private readonly paths: Record<string, string>;
-  private readonly methods: Record<string, string>;
-
+export class HttpAdapter<O extends Array<Operation>> {
   public readonly proxy: {
-    [Key in keyof O]: HttpAdapterProxyFunction<O[Key]>;
+    [Key in O[number]['Key']]: HttpAdapterProxyFunction<
+      Extract<O[number], { Key: Key }>
+    >;
   };
 
-  constructor({
-    paths,
-    methods,
-    ...opts
-  }: {
-    paths: { [K in keyof O]: string };
-    methods: { [K in keyof O]: string };
-  } & HttpAdapterOptions) {
-    this.opts = opts;
-    this.paths = paths;
-    this.methods = methods;
-
+  constructor(private readonly opts: HttpAdapterOptions<O> = {}) {
     this.proxy = new Proxy<this['proxy']>({} as any, {
       get: (_target, p) => (paths?: any) => {
-        const builder = this.createBuilder(String(p));
+        const builder = this.call(String(p));
         if (paths) {
           builder.path(paths);
         }
@@ -38,16 +26,51 @@ export class HttpAdapter<O extends Operations> {
     });
   }
 
-  call<Key extends keyof O>(id: Key) {
-    return this.createBuilder(id);
+  call<Index extends number, Key extends O[Index]['Key']>(
+    id: Key
+  ): HttpAdapterBuilder<O[Index]> {
+    const idStr = String(id);
+    const op = this.opts.operations?.[id];
+
+    if (!op) {
+      throw new Error(
+        `Operation not found in dictionary for "${idStr}" operation.`
+      );
+    }
+
+    return new HttpAdapterBuilder({
+      path: op.path,
+      method: op.method,
+      ...this.opts,
+    });
   }
 
-  get<Key extends OperationsIdsByMethod<O, 'GET'>>(id: Key) {
-    return this.createBuilder(id);
+  get<P extends OperationPathsByMethod<O, 'GET'>>(path: P) {
+    return new HttpAdapterBuilder<FindOperationByPath<O, P>>({
+      path,
+      method: 'GET',
+    });
   }
 
-  post<Key extends OperationsIdsByMethod<O, 'POST'>>(id: Key) {
-    return this.createBuilder(id);
+  post<P extends OperationPathsByMethod<O, 'POST'>>(path: P) {
+    return new HttpAdapterBuilder<FindOperationByPath<O, P>>({
+      path,
+      method: 'POST',
+    });
+  }
+
+  put<P extends OperationPathsByMethod<O, 'PUT'>>(path: P) {
+    return new HttpAdapterBuilder<FindOperationByPath<O, P>>({
+      path,
+      method: 'PUT',
+    });
+  }
+
+  delete<P extends OperationPathsByMethod<O, 'DELETE'>>(path: P) {
+    return new HttpAdapterBuilder<FindOperationByPath<O, P>>({
+      path,
+      method: 'DELETE',
+    });
   }
 
   request(
@@ -82,27 +105,5 @@ export class HttpAdapter<O extends Operations> {
     }
 
     return builder;
-  }
-
-  private createBuilder<Key extends keyof O>(
-    id: Key
-  ): HttpAdapterBuilder<O[Key]> {
-    const idStr = String(id);
-    const path = this.paths[idStr];
-    const method = this.methods[idStr];
-
-    if (!path) {
-      throw new Error(`Path not found in dictionary for "${idStr}" operation.`);
-    }
-
-    if (!method) {
-      throw new Error(`Path not found in dictionary for "${idStr}" operation.`);
-    }
-
-    return new HttpAdapterBuilder({
-      path,
-      method,
-      ...this.opts,
-    });
   }
 }

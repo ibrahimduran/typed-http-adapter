@@ -2,26 +2,38 @@ import type { HttpAdapterBuilder } from './builder';
 
 type GetterOption<T> = T | (() => T) | (() => Promise<T>);
 
-export interface HttpAdapterOptions {
+export interface HttpAdapterOptions<T extends Array<Operation>> {
   baseUrl?: GetterOption<string | null>;
   authorization?: GetterOption<string | null>;
+  operations?: { [Key in T[number]['Key']]?: { path: string; method: string } };
 }
 
-export type Operations = {
-  [key: string]: {
-    Method: 'GET' | 'POST';
+export type Operation = {
+  Key: string;
+  Method: 'GET' | 'POST';
+  Path: string;
+  Param: {
     Query: Record<string, unknown>;
     Path: Record<string, unknown>;
-    Body: Record<string, unknown>;
-    Response: Record<number, unknown>;
   };
+  Body: Record<string, unknown>;
+  Response: Record<number, unknown>;
 };
 
-export type OperationsIdsByMethod<
-  O extends Operations,
-  M extends 'GET' | 'POST'
+export type OperationPathsByMethod<
+  O extends Array<Operation>,
+  M extends 'GET' | 'POST' | 'PUT' | 'DELETE'
 > = ValueOf<{
-  [Key in keyof O]: O[Key]['Method'] extends M ? Key : never;
+  [Key in keyof O]: O[Key]['Method'] extends M ? O[Key]['Path'] : never;
+}>;
+
+export type FindOperationByPath<
+  O extends Array<Operation>,
+  P extends string
+> = ValueOf<{
+  [Path in O[number]['Path']]: Path extends P
+    ? Extract<O[number], { Path: P }>
+    : never;
 }>;
 
 export type SuccessStatusCodes =
@@ -36,13 +48,13 @@ export type SuccessStatusCodes =
   | 208
   | 226;
 
-export type OperationSendResponse<O extends Operations[string]> = ValueOf<{
+export type OperationSendResponse<O extends Operation> = ValueOf<{
   [S in SuccessStatusCodes]: O['Response'] extends { [SS in S]: infer T }
     ? T
     : never;
 }>;
 
-export type OperationRawResponse<O extends Operations[string]> = ValueOf<{
+export type OperationRawResponse<O extends Operation> = ValueOf<{
   [S in keyof O['Response']]: {
     status: S;
     body: O['Response'][S];
@@ -51,7 +63,7 @@ export type OperationRawResponse<O extends Operations[string]> = ValueOf<{
 
 export type ValueOf<T> = T[keyof T];
 
-export type HttpAdapterProxyFunction<O extends Operations[string]> = {
+export type HttpAdapterProxyFunction<O extends Operation> = {
   (): HttpAdapterBuilder<O>;
   (path: O['Path']): HttpAdapterBuilder<
     O,
