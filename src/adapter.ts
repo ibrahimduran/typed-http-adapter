@@ -80,7 +80,7 @@ export class HttpAdapter<O extends Array<Operation>> {
   request(
     path: string,
     opts: {
-      method?: string;
+      method?: Operation['Method'];
       type?: string;
       body?: any;
       query?: Record<string, any>;
@@ -88,7 +88,17 @@ export class HttpAdapter<O extends Array<Operation>> {
     } = {}
   ) {
     const builder = new HttpAdapterBuilder<
-      any,
+      {
+        Key: string;
+        Path: string;
+        Method: Operation['Method'];
+        Param: {
+          Query: Record<string, string>;
+          Path: Record<string, string>;
+        };
+        Body: Record<string, any>;
+        Response: any;
+      },
       { Body: true; Query: true; Path: true }
     >({
       path,
