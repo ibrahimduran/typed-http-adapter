@@ -65,11 +65,7 @@ export type ValueOf<T> = T[keyof T];
 
 export type HttpAdapterProxyFunction<O extends Operation> = {
   (): HttpAdapterBuilder<O>;
-  (path: O['Path']): HttpAdapterBuilder<
-    O,
-    { Path: true; Query: false; Body: false }
-  >;
-  (path: O['Path']): HttpAdapterBuilder<
+  (path: O['Param']['Path']): HttpAdapterBuilder<
     O,
     { Path: true; Query: false; Body: false }
   >;
