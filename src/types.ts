@@ -10,7 +10,7 @@ export interface HttpAdapterOptions<T extends Array<Operation>> {
 
 export type Operation = {
   Key: string;
-  Method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD';
+  Method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE' | 'HEAD';
   Path: string;
   Param: {
     Query: Record<string, unknown>;
@@ -22,7 +22,7 @@ export type Operation = {
 
 export type OperationPathsByMethod<
   O extends Array<Operation>,
-  M extends 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD'
+  M extends 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE' | 'HEAD'
 > = ValueOf<{
   [Key in keyof O]: O[Key]['Method'] extends M ? O[Key]['Path'] : never;
 }>;
