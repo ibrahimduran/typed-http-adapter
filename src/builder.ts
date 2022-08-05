@@ -19,6 +19,7 @@ export class HttpAdapterBuilder<
   private _query: any;
   private _type: any;
   private _body: any;
+  private _bearer: string | null | undefined;
   private _headers: any = {};
 
   constructor(
@@ -44,6 +45,11 @@ export class HttpAdapterBuilder<
 
   header(key: string, value: string) {
     this._headers[key] = value;
+    return this;
+  }
+
+  bearer(value: string | null | undefined) {
+    this._bearer = value;
     return this;
   }
 
@@ -94,6 +100,14 @@ export class HttpAdapterBuilder<
     const url = await this._buildUrl();
     const body = await this._buildBody();
     const headers = await this._buildHeaders(body != null);
+
+    if (typeof this._bearer !== 'undefined') {
+      if (this._bearer) {
+        headers['Authorization'] = `Bearer ${this._bearer}`;
+      } else {
+        delete headers['Authorization'];
+      }
+    }
 
     let res: Response;
 
