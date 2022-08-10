@@ -2,10 +2,10 @@ import type { HttpAdapterBuilder } from './builder';
 
 type GetterOption<T> = T | (() => T) | (() => Promise<T>);
 
-export interface HttpAdapterOptions<T extends Array<Operation>> {
+export interface HttpAdapterOptions<T extends Operation> {
   baseUrl?: GetterOption<string | null>;
   authorization?: GetterOption<string | null>;
-  operations?: { [Key in T[number]['Key']]?: { path: string; method: string } };
+  operations?: { [Key in T['Key']]?: { path: string; method: string } };
 }
 
 export type Operation = {
@@ -21,19 +21,19 @@ export type Operation = {
 };
 
 export type OperationPathsByMethod<
-  O extends Array<Operation>,
+  O extends Operation,
   M extends 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE' | 'HEAD'
 > = ValueOf<{
-  [Key in keyof O]: O[Key]['Method'] extends M ? O[Key]['Path'] : never;
+  [Key in O['Key']]: Extract<O, { Key: Key }>['Method'] extends M
+    ? Extract<O, { Key: Key }>['Path']
+    : never;
 }>;
 
 export type FindOperationByPath<
-  O extends Array<Operation>,
+  O extends Operation,
   P extends string
 > = ValueOf<{
-  [Path in O[number]['Path']]: Path extends P
-    ? Extract<O[number], { Path: P }>
-    : never;
+  [Path in O['Path']]: Path extends P ? Extract<O, { Path: P }> : never;
 }>;
 
 export type SuccessStatusCodes =

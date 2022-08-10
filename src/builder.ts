@@ -27,7 +27,7 @@ export class HttpAdapterBuilder<
     private readonly opts: {
       path: string;
       method: string;
-    } & HttpAdapterOptions<[O]>
+    } & HttpAdapterOptions<O>
   ) {}
 
   path(

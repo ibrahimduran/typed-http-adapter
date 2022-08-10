@@ -7,11 +7,9 @@ import type {
   OperationPathsByMethod,
 } from './types';
 
-export class HttpAdapter<O extends Array<Operation>> {
+export class HttpAdapter<O extends Operation> {
   public readonly proxy: {
-    [Key in O[number]['Key']]: HttpAdapterProxyFunction<
-      Extract<O[number], { Key: Key }>
-    >;
+    [Key in O['Key']]: HttpAdapterProxyFunction<Extract<O, { Key: Key }>>;
   };
 
   constructor(private readonly opts: HttpAdapterOptions<O> = {}) {
@@ -26,9 +24,9 @@ export class HttpAdapter<O extends Array<Operation>> {
     });
   }
 
-  call<Index extends number, Key extends O[Index]['Key']>(
+  call<Key extends O['Key']>(
     id: Key
-  ): HttpAdapterBuilder<O[Index]> {
+  ): HttpAdapterBuilder<Extract<O, { Key: Key }>> {
     const idStr = String(id);
     const op = this.opts.operations?.[id];
 
