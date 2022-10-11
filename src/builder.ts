@@ -19,7 +19,8 @@ export class HttpAdapterBuilder<
   private _query: any;
   private _type: any;
   private _body: any;
-  private _bearer: string | null | undefined;
+  private _token: string | null | undefined;
+  private _auth_prefix: string | null | undefined;
   private _headers: any = {};
 
   constructor(
@@ -49,7 +50,14 @@ export class HttpAdapterBuilder<
   }
 
   bearer(value: string | null | undefined) {
-    this._bearer = value;
+    this._token = value;
+    this._auth_prefix = 'Bearer';
+    return this;
+  }
+
+  auth(prefix: string | null | undefined, value: string | null | undefined) {
+    this._auth_prefix = prefix;
+    this._token = value;
     return this;
   }
 
@@ -101,9 +109,9 @@ export class HttpAdapterBuilder<
     const body = await this._buildBody();
     const headers = await this._buildHeaders(body != null);
 
-    if (typeof this._bearer !== 'undefined') {
-      if (this._bearer) {
-        headers['Authorization'] = `Bearer ${this._bearer}`;
+    if (typeof this._token !== 'undefined') {
+      if (this._token) {
+        headers['Authorization'] = `${this._auth_prefix ? `${this._auth_prefix} ` : ''}${this._token}`;
       } else {
         delete headers['Authorization'];
       }
