@@ -111,7 +111,9 @@ export class HttpAdapterBuilder<
 
     if (typeof this._token !== 'undefined') {
       if (this._token) {
-        headers['Authorization'] = `${this._auth_prefix ? `${this._auth_prefix} ` : ''}${this._token}`;
+        headers['Authorization'] = `${
+          this._auth_prefix ? `${this._auth_prefix} ` : ''
+        }${this._token}`;
       } else {
         delete headers['Authorization'];
       }
