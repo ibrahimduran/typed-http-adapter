@@ -150,7 +150,9 @@ export class HttpAdapterBuilder<
         ? await this.opts.baseUrl()
         : this.opts.baseUrl;
 
-    return normalizeUrl(`${baseUrl || ''}${path}${searchParams}`);
+    return normalizeUrl(`${baseUrl || ''}${path}${searchParams}`, {
+      removeTrailingSlash: false,
+    });
   }
 
   private async _buildHeaders(hasBody: boolean) {
