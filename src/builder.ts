@@ -155,10 +155,14 @@ export class HttpAdapterBuilder<
       searchParams = (path.indexOf('?') === -1 ? '?' : '&') + searchParams;
     }
 
-    const baseUrl =
+    let baseUrl =
       typeof this.opts.baseUrl === 'function'
         ? await this.opts.baseUrl()
         : this.opts.baseUrl;
+
+    if (baseUrl?.startsWith('/') && typeof document !== 'undefined' && typeof document.location !== 'undefined') {
+      baseUrl = document.location.origin + baseUrl;
+    }
 
     return normalizeUrl(`${baseUrl || ''}${path}${searchParams}`, {
       removeTrailingSlash: false,
