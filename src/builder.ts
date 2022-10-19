@@ -122,11 +122,17 @@ export class HttpAdapterBuilder<
     let res: Response;
 
     try {
-      res = await fetch(url, {
+      let init: RequestInit = {
         method,
         body,
         headers,
-      });
+      };
+
+      if (this.opts.factory) {
+        init = await this.opts.factory(url, init);
+      }
+
+      res = await fetch(url, init);
     } catch (err) {
       return await HttpAdapterResult.createFromError(err);
     }

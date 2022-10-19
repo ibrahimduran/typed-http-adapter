@@ -6,6 +6,7 @@ export interface HttpAdapterOptions<T extends Operation> {
   baseUrl?: GetterOption<string | null>;
   authorization?: GetterOption<string | null>;
   operations?: { [Key in T['Key']]?: { path: string; method: string } };
+  factory?: (url: string, opts: RequestInit) => RequestInit | Promise<RequestInit>;
 }
 
 export type Operation = {
