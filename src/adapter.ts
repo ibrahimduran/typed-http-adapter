@@ -1,6 +1,5 @@
 import { HttpAdapterBuilder } from './builder';
 import type {
-  FindOperationByPath,
   HttpAdapterOptions,
   HttpAdapterProxyFunction,
   Operation,
@@ -44,7 +43,7 @@ export class HttpAdapter<O extends Operation> {
   }
 
   get<P extends OperationPathsByMethod<O, 'GET'>>(path: P) {
-    return new HttpAdapterBuilder<FindOperationByPath<O, P>>({
+    return new HttpAdapterBuilder<Extract<O, { Path: P, Method: 'GET' }>>({
       path,
       method: 'GET',
       ...this.opts,
@@ -52,7 +51,7 @@ export class HttpAdapter<O extends Operation> {
   }
 
   post<P extends OperationPathsByMethod<O, 'POST'>>(path: P) {
-    return new HttpAdapterBuilder<FindOperationByPath<O, P>>({
+    return new HttpAdapterBuilder<Extract<O, { Path: P, Method: 'POST' }>>({
       path,
       method: 'POST',
       ...this.opts,
@@ -60,7 +59,7 @@ export class HttpAdapter<O extends Operation> {
   }
 
   put<P extends OperationPathsByMethod<O, 'PUT'>>(path: P) {
-    return new HttpAdapterBuilder<FindOperationByPath<O, P>>({
+    return new HttpAdapterBuilder<Extract<O, { Path: P, Method: 'PUT' }>>({
       path,
       method: 'PUT',
       ...this.opts,
@@ -68,7 +67,7 @@ export class HttpAdapter<O extends Operation> {
   }
 
   delete<P extends OperationPathsByMethod<O, 'DELETE'>>(path: P) {
-    return new HttpAdapterBuilder<FindOperationByPath<O, P>>({
+    return new HttpAdapterBuilder<Extract<O, { Path: P, Method: 'DELETE' }>>({
       path,
       method: 'DELETE',
       ...this.opts,

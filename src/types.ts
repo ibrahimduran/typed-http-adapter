@@ -30,13 +30,6 @@ export type OperationPathsByMethod<
     : never;
 }>;
 
-export type FindOperationByPath<
-  O extends Operation,
-  P extends string
-> = ValueOf<{
-  [Path in O['Path']]: Path extends P ? Extract<O, { Path: P }> : never;
-}>;
-
 export type SuccessStatusCodes =
   | 200
   | 201
